@@ -55,7 +55,7 @@ export const config = {
   },
 
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN?.split(',').map(o => o.trim().replace(/\/+$/, '')) || ['http://localhost:3000'],
   },
 
   rateLimit: {
