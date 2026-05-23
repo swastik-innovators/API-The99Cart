@@ -1,0 +1,15 @@
+// ─── Services Directory ────────────────────────────────────────────────────
+// Business logic services go here.
+// Each service should encapsulate a single domain concern.
+//
+// Example:
+//   src/services/product.service.ts
+//   src/services/order.service.ts
+//   src/services/auth.service.ts
+//
+// Services should:
+//   - Contain all business logic
+//   - Interact with Supabase for data access
+//   - Use Cloudinary for media operations
+//   - Throw ApiError for expected error conditions
+//   - Never access req/res directly (controller handles that)
