@@ -20,13 +20,16 @@ export const HTTP_STATUS = {
   SERVICE_UNAVAILABLE: 503,
 } as const;
 
+const isProd = process.env.NODE_ENV === 'production';
+
 /** Cookie options shared across the app */
 export const COOKIE_DEFAULTS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  secure: isProd,
+  sameSite: 'lax' as const,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   path: '/',
+  domain: isProd ? '.the99cart.com' : (process.env.COOKIE_DOMAIN || undefined),
 };
 
 /** Cloudinary upload presets / folders */

@@ -117,6 +117,8 @@ function setAuthCookies(res: Response, accessToken: string, refreshToken: string
 }
 
 function clearAuthCookies(res: Response): void {
-  res.clearCookie('access_token', { path: '/' });
-  res.clearCookie('refresh_token', { path: '/' });
+  const isProd = process.env.NODE_ENV === 'production';
+  const domain = isProd ? '.the99cart.com' : (process.env.COOKIE_DOMAIN || undefined);
+  res.clearCookie('access_token', { path: '/', domain });
+  res.clearCookie('refresh_token', { path: '/', domain });
 }

@@ -147,6 +147,9 @@ CREATE TABLE IF NOT EXISTS public.sellers (
   social_links    JSONB NOT NULL DEFAULT '{}'::jsonb,
   categories      TEXT[] NOT NULL DEFAULT '{}'::text[],
   policies        JSONB NOT NULL DEFAULT '{}'::jsonb,
+  logo_url        TEXT,
+  custom_theme    JSONB NOT NULL DEFAULT '{"primary_color": "#4F46E5", "header_style": "classic", "footer_text": "Powered by The99Cart", "theme_mode": "dark"}'::jsonb,
+  custom_domain   TEXT UNIQUE,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

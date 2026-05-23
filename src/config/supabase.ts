@@ -35,7 +35,13 @@ export async function testSupabaseConnection(): Promise<boolean> {
     // Simple query to verify connectivity
     const { error } = await supabaseAdmin.from('_health_check').select('*').limit(1);
     // Table may not exist — that's fine; we just need no network error
-    if (error && !error.message.includes('does not exist') && !error.message.includes('relation')) {
+    if (
+      error &&
+      error.code !== 'PGRST205' &&
+      !error.message.includes('does not exist') &&
+      !error.message.includes('relation') &&
+      !error.message.includes('schema cache')
+    ) {
       throw error;
     }
     logger.info('✅ Supabase connection established');

@@ -21,7 +21,15 @@ export const corsOptions: CorsOptions = {
       origin === 'http://localhost' || 
       origin === 'https://localhost';
 
-    if (isLocalhost || allowedOrigins.includes(origin)) {
+    // Allow wildcard subdomains of the99cart.com and lvh.me (local subdomain testing)
+    const isSubdomainMatch = 
+      origin.endsWith('.the99cart.com') || 
+      origin === 'https://the99cart.com' ||
+      /\.lvh\.me(:\d+)?$/.test(origin) ||
+      origin.startsWith('http://lvh.me') ||
+      origin.startsWith('https://lvh.me');
+
+    if (isLocalhost || isSubdomainMatch || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));
