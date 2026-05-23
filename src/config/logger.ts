@@ -17,35 +17,32 @@ const devFormat = printf(({ level, message, timestamp: ts, stack, ...meta }) => 
 });
 
 // ── Transports ─────────────────────────────────────────────────────────────
-const transports: winston.transport[] = [
-  // Error log (errors only)
-  new winston.transports.File({
-    filename: path.join(LOG_DIR, 'error.log'),
-    level: 'error',
-    maxsize: 5_242_880, // 5 MB
-    maxFiles: 5,
-  }),
+const transports: winston.transport[] = [];
 
-  // Combined log (all levels)
-  new winston.transports.File({
-    filename: path.join(LOG_DIR, 'combined.log'),
-    maxsize: 10_485_760, // 10 MB
-    maxFiles: 10,
-  }),
-];
-
-// Pretty console output in development
-if (!config.isProduction) {
+if (config.isProduction) {
+  // In production, log only to console. Vercel capturing stdout/stderr automatically.
   transports.push(
     new winston.transports.Console({
-      format: combine(colorize({ all: true }), devFormat),
+      level: config.log.level,
+      format: combine(json()),
     })
   );
 } else {
-  // JSON output for production log aggregators
+  // In development, log to files and console
   transports.push(
     new winston.transports.Console({
-      format: combine(json()),
+      format: combine(colorize({ all: true }), devFormat),
+    }),
+    new winston.transports.File({
+      filename: path.join(LOG_DIR, 'error.log'),
+      level: 'error',
+      maxsize: 5_242_880, // 5 MB
+      maxFiles: 5,
+    }),
+    new winston.transports.File({
+      filename: path.join(LOG_DIR, 'combined.log'),
+      maxsize: 10_485_760, // 10 MB
+      maxFiles: 10,
     })
   );
 }
