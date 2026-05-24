@@ -268,3 +268,145 @@ CREATE POLICY "Sellers can manage their own product files"
       WHERE p.id = product_id AND p.seller_id = auth.uid()
     )
   );
+
+
+-- ── 11. Extensions for Digital Product Listings ──────────────────────────────
+
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS subcategory_id TEXT,
+  ADD COLUMN IF NOT EXISTS variants JSONB DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS labels TEXT[] DEFAULT '{}'::text[],
+  ADD COLUMN IF NOT EXISTS gst NUMERIC(5, 2) DEFAULT 0.00,
+  ADD COLUMN IF NOT EXISTS faqs JSONB DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS testimonials JSONB DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS digital_link TEXT,
+  ADD COLUMN IF NOT EXISTS demo_url TEXT,
+  ADD COLUMN IF NOT EXISTS file_size TEXT,
+  ADD COLUMN IF NOT EXISTS file_format TEXT,
+  ADD COLUMN IF NOT EXISTS key_features TEXT[] DEFAULT '{}'::text[],
+  ADD COLUMN IF NOT EXISTS bundle_products UUID[] DEFAULT '{}'::uuid[];
+
+
+-- ── 12. Orders Table & Tracking ───────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS public.orders (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  seller_id       UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  store_id        UUID NOT NULL REFERENCES public.sellers(id) ON DELETE CASCADE,
+  customer_name   TEXT NOT NULL,
+  customer_email  TEXT NOT NULL,
+  product_id      UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  amount          NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+  payment_method  TEXT NOT NULL DEFAULT 'Stripe',
+  status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded')),
+  source          TEXT NOT NULL DEFAULT 'marketplace' CHECK (source IN ('marketplace', 'store_direct', 'instagram', 'whatsapp', 'link_share')),
+  timeline        JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Enable RLS for Orders
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Sellers can view own orders"
+  ON public.orders FOR SELECT USING (auth.uid() = seller_id);
+
+CREATE POLICY "Sellers can update own orders"
+  ON public.orders FOR UPDATE USING (auth.uid() = seller_id);
+
+
+-- ── 13. Coupons Table ─────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS public.coupons (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id        UUID NOT NULL REFERENCES public.sellers(id) ON DELETE CASCADE,
+  code            TEXT NOT NULL,
+  discount_type   TEXT NOT NULL DEFAULT 'percentage' CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value  NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+  expires_at      TIMESTAMPTZ,
+  usage_limit     INTEGER,
+  usage_count     INTEGER NOT NULL DEFAULT 0,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT unique_store_coupon UNIQUE (store_id, code)
+);
+
+-- Enable RLS for Coupons
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Coupons are viewable by everyone"
+  ON public.coupons FOR SELECT USING (true);
+
+CREATE POLICY "Sellers can manage own coupons"
+  ON public.coupons FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.sellers s
+      WHERE s.id = store_id AND s.id = auth.uid()
+    )
+  );
+
+
+-- ── 14. Reviews Table ─────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id        UUID NOT NULL REFERENCES public.sellers(id) ON DELETE CASCADE,
+  product_id      UUID REFERENCES public.products(id) ON DELETE CASCADE,
+  store_slug      TEXT NOT NULL,
+  customer_name   TEXT NOT NULL,
+  customer_email  TEXT,
+  rating          INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment         TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Enable RLS for Reviews
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Reviews are viewable by everyone"
+  ON public.reviews FOR SELECT USING (true);
+
+CREATE POLICY "Anyone can insert reviews"
+  ON public.reviews FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Sellers can manage reviews of their store"
+  ON public.reviews FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.sellers s
+      WHERE s.id = store_id AND s.id = auth.uid()
+    )
+  );
+
+
+-- ── 15. Withdrawals Table ─────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS public.withdrawals (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  seller_id       UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  amount          NUMERIC(12, 2) NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Enable RLS for Withdrawals
+ALTER TABLE public.withdrawals ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Sellers can manage own withdrawals"
+  ON public.withdrawals FOR ALL USING (auth.uid() = seller_id);
+
+
+-- ── 16. Support Tickets Table ─────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS public.support_tickets (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  seller_id       UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title           TEXT NOT NULL,
+  message         TEXT NOT NULL,
+  status          TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'in_progress', 'closed')),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Enable RLS for Support Tickets
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Sellers can manage own support tickets"
+  ON public.support_tickets FOR ALL USING (auth.uid() = seller_id);
+

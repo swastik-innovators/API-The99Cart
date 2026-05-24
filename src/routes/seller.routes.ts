@@ -3,6 +3,7 @@
 
 import { Router } from 'express';
 import { sellerController } from '../controllers/seller.controller';
+import { sellerExtraController } from '../controllers/seller-extra.controller';
 import { authenticate, authorize, validate } from '../middleware';
 import { createSellerSchema, updateSellerSchema } from '../validators/seller.validator';
 
@@ -78,5 +79,24 @@ router.post('/create', validate(createSellerSchema, 'body'), sellerController.cr
  *             $ref: '#/components/schemas/UpdateSellerInput'
  */
 router.patch('/update', validate(updateSellerSchema, 'body'), sellerController.update);
+
+// ─── Seller Dashboard Extra Module Routes ────────────────────────────────────
+router.get('/orders', sellerExtraController.getOrders);
+router.patch('/orders/:id/status', sellerExtraController.updateOrderStatus);
+
+router.get('/coupons', sellerExtraController.getCoupons);
+router.post('/coupons', sellerExtraController.createCoupon);
+router.delete('/coupons/:id', sellerExtraController.deleteCoupon);
+
+router.get('/reviews', sellerExtraController.getReviews);
+
+router.get('/payments', sellerExtraController.getPayments);
+router.post('/withdrawals', sellerExtraController.requestWithdrawal);
+
+router.get('/support/tickets', sellerExtraController.getTickets);
+router.post('/support/tickets', sellerExtraController.createTicket);
+
+router.post('/generate-listing', sellerExtraController.generateProductListing);
+router.post('/ai-growth', sellerExtraController.getAiGrowth);
 
 export default router;

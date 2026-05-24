@@ -32,6 +32,19 @@ export interface Product {
   views: number;
   created_at: string;
   updated_at: string;
+  
+  // Custom new fields
+  variants?: any[];
+  labels?: string[];
+  gst?: number;
+  faqs?: Array<{ question: string; answer: string }>;
+  testimonials?: Array<{ name: string; comment: string; rating: number; date: string }>;
+  digital_link?: string;
+  demo_url?: string;
+  file_size?: string;
+  file_format?: string;
+  key_features?: string[];
+  bundle_products?: string[];
 }
 
 export interface ProductFile {
@@ -73,6 +86,19 @@ export interface CreateProductInput {
     file_size?: number;
     storage_type?: 'supabase' | 'cloudinary';
   }>;
+  
+  // New fields
+  variants?: any[];
+  labels?: string[];
+  gst?: number;
+  faqs?: Array<{ question: string; answer: string }>;
+  testimonials?: Array<{ name: string; comment: string; rating: number; date: string }>;
+  digital_link?: string;
+  demo_url?: string;
+  file_size?: string;
+  file_format?: string;
+  key_features?: string[];
+  bundle_products?: string[];
 }
 
 export interface UpdateProductInput extends Partial<Omit<CreateProductInput, 'files'>> {
@@ -99,3 +125,4 @@ export interface ProductFilters {
   page?: number;
   limit?: number;
 }
+

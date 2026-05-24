@@ -8,11 +8,13 @@ export interface SellerProfile {
   phone: string;
   business_type: string;
   profile_image: string | null;
+  logo_url: string | null;
   banner_image: string | null;
   description: string | null;
   social_links: Record<string, string>;
   categories: string[];
   policies: Record<string, string>;
+  custom_theme: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
@@ -23,11 +25,13 @@ export interface CreateSellerInput {
   phone: string;
   business_type: string;
   profile_image?: string | null;
+  logo_url?: string | null;
   banner_image?: string | null;
   description?: string | null;
   social_links?: Record<string, string>;
   categories?: string[];
   policies?: Record<string, string>;
+  custom_theme?: Record<string, any>;
 }
 
 export interface UpdateSellerInput {
@@ -36,9 +40,11 @@ export interface UpdateSellerInput {
   phone?: string;
   business_type?: string;
   profile_image?: string | null;
+  logo_url?: string | null;
   banner_image?: string | null;
   description?: string | null;
   social_links?: Record<string, string>;
   categories?: string[];
   policies?: Record<string, string>;
+  custom_theme?: Record<string, any>;
 }

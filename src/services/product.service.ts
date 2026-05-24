@@ -91,6 +91,17 @@ export class ProductService {
         seo_title: input.seo_title,
         seo_description: input.seo_description,
         seo_keywords: input.seo_keywords || [],
+        variants: input.variants || [],
+        labels: input.labels || [],
+        gst: input.gst || 0.00,
+        faqs: input.faqs || [],
+        testimonials: input.testimonials || [],
+        digital_link: input.digital_link || null,
+        demo_url: input.demo_url || null,
+        file_size: input.file_size || null,
+        file_format: input.file_format || null,
+        key_features: input.key_features || [],
+        bundle_products: input.bundle_products || [],
       })
       .select()
       .single();

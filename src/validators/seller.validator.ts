@@ -34,6 +34,7 @@ export const createSellerSchema = z.object({
     .min(2, 'Business type must be at least 2 characters')
     .max(50, 'Business type must be 50 characters or fewer'),
   profile_image: z.string().url('Invalid profile image URL').nullable().optional(),
+  logo_url: z.string().url('Invalid logo image URL').nullable().optional(),
   banner_image: z.string().url('Invalid banner image URL').nullable().optional(),
   description: z
     .string()
@@ -44,6 +45,7 @@ export const createSellerSchema = z.object({
   social_links: z.record(z.string(), z.string()).optional(),
   categories: z.array(z.string()).optional(),
   policies: z.record(z.string(), z.string()).optional(),
+  custom_theme: z.record(z.any()).optional(),
 });
 
 export type CreateSellerInput = z.infer<typeof createSellerSchema>;
@@ -66,6 +68,7 @@ export const updateSellerSchema = z.object({
     .max(50, 'Business type must be 50 characters or fewer')
     .optional(),
   profile_image: z.string().url('Invalid profile image URL').nullable().optional(),
+  logo_url: z.string().url('Invalid logo image URL').nullable().optional(),
   banner_image: z.string().url('Invalid banner image URL').nullable().optional(),
   description: z
     .string()
@@ -76,6 +79,7 @@ export const updateSellerSchema = z.object({
   social_links: z.record(z.string(), z.string()).optional(),
   categories: z.array(z.string()).optional(),
   policies: z.record(z.string(), z.string()).optional(),
+  custom_theme: z.record(z.any()).optional(),
 });
 
 export type UpdateSellerInput = z.infer<typeof updateSellerSchema>;

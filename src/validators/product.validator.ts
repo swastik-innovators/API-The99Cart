@@ -50,6 +50,26 @@ const baseProductSchema = z.object({
     file_size: z.number().optional(),
     storage_type: z.enum(['supabase', 'cloudinary']).default('supabase'),
   })).optional(),
+
+  variants: z.array(z.any()).default([]),
+  labels: z.array(z.string()).default([]),
+  gst: z.number().min(0).max(100).default(0),
+  faqs: z.array(z.object({
+    question: z.string(),
+    answer: z.string()
+  })).default([]),
+  testimonials: z.array(z.object({
+    name: z.string(),
+    comment: z.string(),
+    rating: z.number(),
+    date: z.string()
+  })).default([]),
+  digital_link: z.string().url('Digital link must be a valid URL').optional().or(z.literal('')),
+  demo_url: z.string().url('Demo URL must be a valid URL').optional().or(z.literal('')),
+  file_size: z.string().optional(),
+  file_format: z.string().optional(),
+  key_features: z.array(z.string()).default([]),
+  bundle_products: z.array(z.string().uuid()).default([]),
 });
 
 // ─── Create Product Schema (With Refinements) ────────────────────────────────

@@ -104,11 +104,23 @@ export class SellerService {
         phone: input.phone,
         business_type: input.business_type,
         profile_image: input.profile_image || null,
+        logo_url: input.logo_url || null,
         banner_image: input.banner_image || null,
         description: input.description || null,
         social_links: input.social_links || {},
         categories: input.categories || [],
         policies: input.policies || {},
+        custom_theme: input.custom_theme || {
+          theme_name: "Modern",
+          primary_color: "#1654a0",
+          secondary_color: "#4F46E5",
+          font_family: "Inter",
+          holiday_mode: false,
+          announcement: { enabled: false, text: "", link: "" },
+          whatsapp: { enabled: false, number: "" },
+          sections: { hero: true, featured: true, testimonials: true, faq: true, reviews: true, about: true },
+          faqs: []
+        }
       })
       .select('*')
       .single();
@@ -158,11 +170,13 @@ export class SellerService {
         phone: input.phone ?? currentProfile.phone,
         business_type: input.business_type ?? currentProfile.business_type,
         profile_image: input.profile_image !== undefined ? input.profile_image : currentProfile.profile_image,
+        logo_url: input.logo_url !== undefined ? input.logo_url : currentProfile.logo_url,
         banner_image: input.banner_image !== undefined ? input.banner_image : currentProfile.banner_image,
         description: input.description !== undefined ? input.description : currentProfile.description,
         social_links: input.social_links ?? currentProfile.social_links ?? {},
         categories: input.categories ?? currentProfile.categories ?? [],
         policies: input.policies ?? currentProfile.policies ?? {},
+        custom_theme: input.custom_theme ?? currentProfile.custom_theme ?? {},
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
